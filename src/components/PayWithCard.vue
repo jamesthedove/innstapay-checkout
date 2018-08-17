@@ -4,10 +4,14 @@
       <div class="text-xs-center">
         <h3 class="red--text">₦ {{amount}}</h3>
       </div>
-      <template v-if="success">
+      <v-alert v-if="error" outline color="error" icon="warning" :value="error">
+        {{error}}
+      </v-alert>
+      <template v-else-if="success">
         <h3>{{successMessage}}</h3>
       </template>
       <template v-else-if="target === 'card'">
+
 
 
         <div class='card-wrapper'></div>
@@ -56,7 +60,8 @@ export default {
         success: false,
         successMessage: '',
         cardLoading: false,
-        otpLoading: false
+        otpLoading: false,
+        error: ''
     }
   },
     watch: {
@@ -85,6 +90,13 @@ export default {
                       this.successMessage = data.message;
                       this.success = true;
                   }
+              }).catch((r) => {
+                  this.otpLoading = false;
+                  const response = r.data;
+
+                  if (response.status === 'error'){
+                      this.error = response.message;
+                  }
               })
           }
 
@@ -102,6 +114,7 @@ export default {
                   cvv: this.cvv,
                   month: month,
                   year: year,
+                  ref: this.reference,
                   amount: this.amount,
                   email: this.email,
                   merchantPKey: this.pkey,
@@ -120,6 +133,8 @@ export default {
                           this.successMessage = data.message;
                           this.success = true;
                       }
+                  } else if(data.status === 'error') {
+                      this.error = data.message;
                   }
 
 
@@ -133,7 +148,8 @@ export default {
     props: {
     pkey: String,
     amount: 0,
-    email: String
+    email: String,
+    reference: String
 
   },
   mounted(){
@@ -167,9 +183,9 @@ export default {
               cvc: '•••'
           },
 
-          masks: {
-              cardNumber: '•' // optional - mask card number
-          },
+//          masks: {
+//              cardNumber: '•' // optional - mask card number
+//          },
 
           // if true, will log helpful messages for setting up Card
           debug: false // optional - default false

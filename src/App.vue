@@ -38,7 +38,7 @@
                       key="ussd"
                       href="#tab-ussd"
               >
-                USSD
+                BANK
               </v-tab>
             </v-tabs>
           </v-toolbar>
@@ -48,13 +48,13 @@
                     id="tab-card"
                     key="card"
             >
-              <pay-with-card :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-card>
+              <pay-with-card :reference="reference" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-card>
             </v-tab-item>
             <v-tab-item
                     id="tab-ussd"
                     key="ussd"
             >
-             <pay-with-ussd :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-ussd>
+             <pay-with-ussd :reference="reference" v-if="banks && banks.length > 0" :banks="banks" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-ussd>
             </v-tab-item>
           </v-tabs-items>
         </v-flex>
@@ -88,7 +88,9 @@ export default {
       merchantServices: '',
       amount: 0,
       merchantPublicKey: '',
-      userEmail: ''
+      userEmail: '',
+      banks: [],
+      reference: ''
     }
   },
   methods: {
@@ -100,10 +102,11 @@ export default {
     this.merchantPublicKey = Utilites.getParameterByName('k') || 'KDLFkfsdkfjLKJ45839udfasf';
     this.userEmail = Utilites.getParameterByName('e') || 'jamesthedove@gmail.com';
     this.amount = Utilites.getParameterByName('a') || 10
-    axios.get(Config.baseUrl+Config.getMerchant,{
+    axios.get(Config.baseUrl+Config.initialiseTransactionUrl,{
         params: {
             k: this.merchantPublicKey,
-            a: this.amount
+            a: this.amount,
+            e: this.userEmail
         }
     }).then((response) => {
         const data = response.data;
@@ -111,7 +114,9 @@ export default {
             this.merchantName = data.name;
             this.merchantLogo = data.logo;
             this.merchantServices = data.services;
+            this.banks = data.banks;
             this.loading = false;
+            this.reference = data.ref;
         }
 
 

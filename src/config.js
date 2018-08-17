@@ -5,7 +5,7 @@
 export default {
     baseUrl: 'http://localhost:4667/api/payments/v1/',
     chargeUrl: `initiateCharge`,
-    chargeUSSDUrl: `intiateUssdCharge`,
+    chargeBankUrl: `initiateBankCharge`,
     continueUrl: `continuePayment`,
-    getMerchant: `getMerchantInfo`
+    initialiseTransactionUrl: `initialiseTransaction`
 }
