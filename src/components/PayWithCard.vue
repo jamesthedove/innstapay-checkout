@@ -45,6 +45,7 @@
 <script>
 import Fingerprint from 'fingerprintjs2'
 import axios from 'axios'
+import validator from 'card-validator'
 import Config from '../config'
 export default {
   name: 'PayWithCard',
@@ -61,7 +62,11 @@ export default {
         successMessage: '',
         cardLoading: false,
         otpLoading: false,
-        error: ''
+        error: '',
+        creditCardRules: [
+             (value) =>
+                validator.number(value).isPotentiallyValid
+        ]
     }
   },
     watch: {
@@ -102,46 +107,49 @@ export default {
 
       },
       pay(){
-          new Fingerprint().get((result) => {
+          if (this.$refs.form.validate()) {
+              new Fingerprint().get((result) => {
 
-              const a = this.expiry.split('/');
-              const month = a[0].replace(/\s/g, '')
-              const year = a[1].replace(/\s/g, '')
+                  const a = this.expiry.split('/');
+                  const month = a[0].replace(/\s/g, '')
+                  const year = a[1].replace(/\s/g, '')
 
-              this.cardLoading = true
-              axios.post(Config.baseUrl+Config.chargeUrl, {
-                  no: this.number.replace(/\s/g, ''),
-                  cvv: this.cvv,
-                  month: month,
-                  year: year,
-                  ref: this.reference,
-                  amount: this.amount,
-                  email: this.email,
-                  merchantPKey: this.pkey,
-                  fingerprint: result
-              }).then((response) => {
-                  const data = response.data;
-                  if (data.status === 'success'){
-                      if (data.action === 'otp' || data.action === 'pin'){
-                          this.otpLabel = data.message;
-                          this.otpData = {
-                              ref: data.ref,
-                              action: data.action
+                  this.cardLoading = true
+                  axios.post(Config.baseUrl+Config.chargeUrl, {
+                      no: this.number.replace(/\s/g, ''),
+                      cvv: this.cvv,
+                      month: month,
+                      year: year,
+                      ref: this.reference,
+                      amount: this.amount,
+                      email: this.email,
+                      merchantPKey: this.pkey,
+                      fingerprint: result
+                  }).then((response) => {
+                      const data = response.data;
+                      if (data.status === 'success'){
+                          if (data.action === 'otp' || data.action === 'pin'){
+                              this.otpLabel = data.message;
+                              this.otpData = {
+                                  ref: data.ref,
+                                  action: data.action
+                              }
+                              this.target = 'otp';
+                          } else if(data.action === 'done'){
+                              this.successMessage = data.message;
+                              this.success = true;
                           }
-                          this.target = 'otp';
-                      } else if(data.action === 'done'){
-                          this.successMessage = data.message;
-                          this.success = true;
+                      } else if(data.status === 'error') {
+                          this.error = data.message;
                       }
-                  } else if(data.status === 'error') {
-                      this.error = data.message;
-                  }
 
 
-              }).catch((e) => {
-                  this.cardLoading = false
+                  }).catch((e) => {
+                      this.cardLoading = false
+                  })
               })
-          })
+          }
+
 
       }
     },
