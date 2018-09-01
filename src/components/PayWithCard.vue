@@ -4,20 +4,24 @@
       <div class="text-xs-center">
         <h3 class="red--text">₦ {{amount}}</h3>
       </div>
-      <v-alert v-if="error" outline color="error" icon="warning" :value="error">
-        {{error}}
-      </v-alert>
+      <template v-if="error">
+        <v-alert outline color="error" icon="warning" :value="error">
+          {{error}}
+        </v-alert>
+        <div class="text-xs-center">
+          <v-btn @click="error = ''" flat color="primary" dark>Try Again</v-btn>
+        </div>
+      </template>
+
       <template v-else-if="success">
         <h3>{{successMessage}}</h3>
       </template>
       <template v-else-if="target === 'card'">
 
-
-
         <div class='card-wrapper'></div>
 
         <v-form class="pa-3 c-form" ref="form">
-          <v-text-field ref="number" placeholder="" id="number" length="16" v-model="number" label="Card Number"></v-text-field>
+          <v-text-field :rules="creditCardRules" ref="number" placeholder="" id="number" length="16" v-model="number" label="Card Number"></v-text-field>
           <v-layout row>
             <v-text-field ref="expiry" placeholder="MM/YY" xs6 id="expiry" v-model="expiry" label="Expiry"></v-text-field>
             <v-text-field @keyup.enter="pay" ref="cvv" placeholder="111" xs6 id="cvv" class="ml-1" v-model="cvv" label="CVV"></v-text-field>
@@ -31,7 +35,7 @@
 
       <template v-else>
         <h3><b>{{otpLabel}}</b></h3>
-        <v-text-field @keyup.enter="verifyOtp" v-model="otp"></v-text-field>
+        <v-text-field ref="otp" :label="otpHint" @keyup.enter="verifyOtp" v-model="otp"></v-text-field>
         <div class="text-xs-center">
           <v-btn :loading="otpLoading" @click="verifyOtp" round color="primary" dark>Pay</v-btn>
         </div>
@@ -45,6 +49,7 @@
 <script>
 import Fingerprint from 'fingerprintjs2'
 import axios from 'axios'
+import cryptico from 'cryptico';
 import validator from 'card-validator'
 import Config from '../config'
 export default {
@@ -55,7 +60,8 @@ export default {
         cvv: '',
         expiry: '',
         target: 'card',
-        otp: '',
+        otpHint: 'OTP',
+        otp: '', // represents either the card pin or otp
         otpLabel: String,
         otpData: Object,
         success: false,
@@ -65,7 +71,7 @@ export default {
         error: '',
         creditCardRules: [
              (value) =>
-                validator.number(value).isPotentiallyValid
+                !!validator.number(value).isPotentiallyValid || 'Invalid Card'
         ]
     }
   },
@@ -84,7 +90,9 @@ export default {
 
     methods:{
       verifyOtp(){
-          if (this.otp){
+          if (this.otpData.action === 'pin'){
+            this.pay();
+          } else if (this.otp){
               this.otpData.value = this.otp;
               this.otpLoading = true
               axios.post(Config.baseUrl+Config.continueUrl,this.otpData).then((response) => {
@@ -95,9 +103,9 @@ export default {
                       this.successMessage = data.message;
                       this.success = true;
                   }
-              }).catch((r) => {
+              }).catch((e) => {
                   this.otpLoading = false;
-                  const response = r.data;
+                  const response = e.response.data;
 
                   if (response.status === 'error'){
                       this.error = response.message;
@@ -107,7 +115,8 @@ export default {
 
       },
       pay(){
-          if (this.$refs.form.validate()) {
+          // if the pin was requested dont validate form, just send the pin in the request
+          if (((this.otp && this.otpData) || this.$refs.form.validate()) && !this.cardLoading) {
               new Fingerprint().get((result) => {
 
                   const a = this.expiry.split('/');
@@ -115,7 +124,7 @@ export default {
                   const year = a[1].replace(/\s/g, '')
 
                   this.cardLoading = true
-                  axios.post(Config.baseUrl+Config.chargeUrl, {
+                  const payload = {
                       no: this.number.replace(/\s/g, ''),
                       cvv: this.cvv,
                       month: month,
@@ -125,16 +134,25 @@ export default {
                       email: this.email,
                       merchantPKey: this.pkey,
                       fingerprint: result
-                  }).then((response) => {
+                  };
+                  if (this.otp && this.otpData && this.otpData.action === 'pin'){
+                      // This means the pin was requested in the initial request
+                      payload.pin = this.otp;
+                  }
+                  const encryptedPayload = cryptico.encrypt(JSON.stringify(payload), Config.publicKey).cipher;
+
+                  axios.post(Config.baseUrl+Config.chargeUrl, {payload: encryptedPayload} ).then((response) => {
                       const data = response.data;
                       if (data.status === 'success'){
                           if (data.action === 'otp' || data.action === 'pin'){
                               this.otpLabel = data.message;
+                              this.otpHint =  data.action === 'pin' ? 'Card pin' : 'OTP';
                               this.otpData = {
                                   ref: data.ref,
                                   action: data.action
-                              }
-                              this.target = 'otp';
+                              };
+                              this.target = 'otp'; //otp can either by PIN or OTP
+                              this.$refs.otp.focus()
                           } else if(data.action === 'done'){
                               this.successMessage = data.message;
                               this.success = true;
@@ -146,6 +164,12 @@ export default {
 
                   }).catch((e) => {
                       this.cardLoading = false
+
+                      const response = e.response.data;
+
+                      if (response.status === 'error'){
+                          this.error = response.message;
+                      }
                   })
               })
           }

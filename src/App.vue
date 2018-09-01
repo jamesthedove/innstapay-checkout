@@ -8,7 +8,7 @@
       <v-layout v-else flex align-center justify-center>
         <v-flex xs12 sm6 elevation-6>
           <v-toolbar
-                  color="cyan"
+                  color="primary"
                   dark
                   tabs
           >
@@ -16,13 +16,16 @@
             <v-toolbar-title>{{merchantName}}</v-toolbar-title>
 
             <v-spacer></v-spacer>
+            <v-btn icon @click="closeDialog">
+              <v-icon>close</v-icon>
+            </v-btn>
 
 
             <v-tabs
                     slot="extension"
                     v-model="paymentMethod"
                     centered
-                    color="cyan"
+                    color="primary"
                     slider-color="yellow"
             >
               <v-tab
@@ -51,7 +54,7 @@
                     id="tab-ussd"
                     key="ussd"
             >
-             <pay-with-ussd :reference="reference" v-if="banks && banks.length > 0" :banks="banks" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-ussd>
+             <pay-with-ussd :reference="reference" :banks="banks" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-ussd>
             </v-tab-item>
           </v-tabs-items>
         </v-flex>
@@ -93,21 +96,35 @@ export default {
   methods: {
       pay(){
 
+      },
+      closeDialog(){
+
       }
   },
   mounted(){
-    this.merchantPublicKey = Utilites.getParameterByName('k') || 'KDLFkfsdkfjLKJ45839udfasf';
-    this.userEmail = Utilites.getParameterByName('e') || 'jamesthedove@gmail.com';
-    this.amount = Utilites.getParameterByName('a') || 10
+    const url = window.location.href.split('?')[0];
+    let id;
+    if (url.indexOf('/process')){
+        //gateway transaction
+        id = window.location.href.substr(location.href.lastIndexOf('/') + 1)
+        console.log(id)
+    }
+    this.merchantPublicKey = Utilites.getParameterByName('k') || 'pk_d074e2b6-7d14-4e41-88eb-0f663256907f';
+    this.userEmail = Utilites.getParameterByName('e') || 'faladeveloper@gmail.com';
+    this.amount = Utilites.getParameterByName('a') || 10;
     axios.get(Config.baseUrl+Config.initialiseTransactionUrl,{
         params: {
             k: this.merchantPublicKey,
             a: this.amount,
-            e: this.userEmail
+            e: this.userEmail,
+            id: id
         }
     }).then((response) => {
         const data = response.data;
         if (data.status === 'success'){
+            if (data.amount){
+                this.amount = parseInt(data.amount);
+            }
             this.merchantName = data.name;
             this.merchantLogo = data.logo;
             this.merchantServices = data.services;

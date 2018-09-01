@@ -90,7 +90,7 @@ export default {
         pkey: String,
         amount: 0,
         email: String,
-        banks: [],
+        banks: null,
         reference: String
   },
   mounted(){
