@@ -1,7 +1,7 @@
 <template>
-  <v-app>
+  <v-app :style="inline ? 'background: none' : ''">
 
-    <v-container  style=" background-color: rgba(0, 0, 0, 0.6);" fluid fill-height>
+    <v-container fluid fill-height>
       <v-layout class="text-xs-center" v-if="loading" flex align-center justify-center>
         <div class="lds-css ng-scope"><div style="width:100%;height:100%" class="lds-double-ring"><div></div><div></div></div></div>
       </v-layout>
@@ -91,7 +91,8 @@ export default {
       userEmail: '',
       banks: [],
       reference: '',
-      id: ''
+      id: '',
+      inline: true
     }
   },
   methods: {
@@ -104,9 +105,10 @@ export default {
   },
   mounted(){
     this.id = Utilites.getParameterByName('i');
-    this.merchantPublicKey = Utilites.getParameterByName('k') || 'pk_d074e2b6-7d14-4e41-88eb-0f663256907f';
-    this.userEmail = Utilites.getParameterByName('e') || 'faladeveloper@gmail.com';
-    this.amount = Utilites.getParameterByName('a') || 10;
+    this.merchantPublicKey = Utilites.getParameterByName('k');
+    this.userEmail = Utilites.getParameterByName('e');
+    this.amount = Utilites.getParameterByName('a');
+    this.inline = !this.id;
     axios.get(Config.baseUrl+Config.initialiseTransactionUrl,{
         params: {
             k: this.merchantPublicKey,
@@ -135,9 +137,6 @@ export default {
 </script>
 
 <style>
-  body{
-    background-color: rgba(0, 0, 0, 0.6);;
-  }
   @keyframes lds-double-ring {
     0% {
       -webkit-transform: rotate(0);
