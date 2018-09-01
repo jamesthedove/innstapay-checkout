@@ -100,7 +100,7 @@ export default {
 
       },
       closeDialog(){
-          window.parent.postMessage('foo','*')
+          window.parent.postMessage('close','*');
       }
   },
   mounted(){
