@@ -100,7 +100,8 @@ export default {
 
       },
       closeDialog(){
-
+          const iframe = document.getElementById("innstapayframe");
+          iframe.style.display = 'none';
       }
   },
   mounted(){
