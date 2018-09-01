@@ -12,4 +12,4 @@ module.exports = {
             // mutate for development...
         }
     }
-}
+};
