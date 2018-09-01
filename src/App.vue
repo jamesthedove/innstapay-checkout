@@ -90,7 +90,8 @@ export default {
       merchantPublicKey: '',
       userEmail: '',
       banks: [],
-      reference: ''
+      reference: '',
+      id: ''
     }
   },
   methods: {
@@ -102,13 +103,7 @@ export default {
       }
   },
   mounted(){
-    const url = window.location.href.split('?')[0];
-    let id;
-    if (url.indexOf('/process')){
-        //gateway transaction
-        id = window.location.href.substr(location.href.lastIndexOf('/') + 1)
-        console.log(id)
-    }
+    this.id = Utilites.getParameterByName('i');
     this.merchantPublicKey = Utilites.getParameterByName('k') || 'pk_d074e2b6-7d14-4e41-88eb-0f663256907f';
     this.userEmail = Utilites.getParameterByName('e') || 'faladeveloper@gmail.com';
     this.amount = Utilites.getParameterByName('a') || 10;
@@ -117,7 +112,7 @@ export default {
             k: this.merchantPublicKey,
             a: this.amount,
             e: this.userEmail,
-            id: id
+            id: this.id
         }
     }).then((response) => {
         const data = response.data;
