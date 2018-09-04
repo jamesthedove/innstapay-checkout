@@ -167,7 +167,7 @@ export default {
 
                       const response = e.response.data;
 
-                      if (response.status === 'error'){
+                      if (!response.status){
                           this.error = response.message;
                       }
                   })

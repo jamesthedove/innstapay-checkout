@@ -72,6 +72,7 @@ import Config from './config'
 import Utilites from './utilities'
 import PayWithCard from './components/PayWithCard'
 import PayWithUssd from './components/PayWithUssd'
+import Fingerprint from 'fingerprintjs2'
 
 export default {
   name: 'App',
@@ -101,6 +102,9 @@ export default {
       },
       closeDialog(){
           window.parent.postMessage('close','*');
+          axios.post(Config.baseUrl + Config.cancelTransactionUrl, {
+              ref: this.reference
+          });
       }
   },
   mounted(){
@@ -109,29 +113,34 @@ export default {
     this.userEmail = Utilites.getParameterByName('e');
     this.amount = Utilites.getParameterByName('a');
     this.inline = !this.id;
-    axios.get(Config.baseUrl+Config.initialiseTransactionUrl,{
-        params: {
-            k: this.merchantPublicKey,
-            a: this.amount,
-            e: this.userEmail,
-            id: this.id
-        }
-    }).then((response) => {
-        const data = response.data;
-        if (data.status === 'success'){
-            if (data.amount){
-                this.amount = parseInt(data.amount);
-            }
-            this.merchantName = data.name;
-            this.merchantLogo = data.logo;
-            this.merchantServices = data.services;
-            this.banks = data.banks;
-            this.loading = false;
-            this.reference = data.ref;
-        }
+
+      new Fingerprint().get((result) => {
+          axios.get(Config.baseUrl+Config.initialiseTransactionUrl,{
+              params: {
+                  k: this.merchantPublicKey,
+                  a: this.amount,
+                  e: this.userEmail,
+                  id: this.id,
+                  f: result
+              }
+          }).then((response) => {
+              const data = response.data;
+              if (data.status === 'success'){
+                  if (data.amount){
+                      this.amount = parseInt(data.amount);
+                  }
+                  this.merchantName = data.name;
+                  this.merchantLogo = data.logo;
+                  this.merchantServices = data.services;
+                  this.banks = data.banks;
+                  this.loading = false;
+                  this.reference = data.ref;
+              }
 
 
-    })
+          })
+      })
+
   }
 }
 </script>
