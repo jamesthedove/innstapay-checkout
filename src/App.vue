@@ -101,7 +101,6 @@ export default {
 
       },
       closeDialog(){
-          console.log(this.reference)
           axios.post(Config.baseUrl + Config.cancelTransactionUrl, {
               ref: this.reference
           }).then((response) => {

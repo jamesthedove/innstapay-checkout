@@ -156,6 +156,9 @@ export default {
                           } else if(data.action === 'done'){
                               this.successMessage = data.message;
                               this.success = true;
+
+                              window.parent.postMessage('done','*');
+
                           }
                       } else if(data.status === 'error') {
                           this.error = data.message;
