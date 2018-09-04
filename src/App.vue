@@ -105,7 +105,7 @@ export default {
               ref: this.reference
           }).then((response) => {
               console.log(response);
-              window.parent.postMessage('close','*');
+              window.parent.postMessage({name: 'close', reference: this.reference},'*');
           }).catch((e) => {
               console.error(e);
           });

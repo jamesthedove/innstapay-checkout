@@ -157,7 +157,7 @@ export default {
                               this.successMessage = data.message;
                               this.success = true;
 
-                              window.parent.postMessage('done','*');
+                              window.parent.postMessage({name: 'done', reference: this.reference},'*');
 
                           }
                       } else if(data.status === 'error') {
