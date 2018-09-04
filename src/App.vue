@@ -101,9 +101,14 @@ export default {
 
       },
       closeDialog(){
-          window.parent.postMessage('close','*');
+          console.log(this.reference)
           axios.post(Config.baseUrl + Config.cancelTransactionUrl, {
               ref: this.reference
+          }).then((response) => {
+              console.log(response);
+              window.parent.postMessage('close','*');
+          }).catch((e) => {
+              console.error(e);
           });
       }
   },
