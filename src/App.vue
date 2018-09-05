@@ -16,7 +16,13 @@
             <v-toolbar-title>{{merchantName}}</v-toolbar-title>
 
             <v-spacer></v-spacer>
-            <v-btn icon @click="closeDialog">
+
+            <v-progress-circular v-if="closing"
+                    indeterminate
+                    color="primary"
+            ></v-progress-circular>
+
+            <v-btn v-else icon @click="closeDialog">
               <v-icon>close</v-icon>
             </v-btn>
 
@@ -93,7 +99,8 @@ export default {
       banks: [],
       reference: '',
       id: '',
-      inline: true
+      inline: true,
+      closing: false
     }
   },
   methods: {
@@ -101,6 +108,7 @@ export default {
 
       },
       closeDialog(){
+          this.closing = true;
           axios.post(Config.baseUrl + Config.cancelTransactionUrl, {
               ref: this.reference
           }).then((response) => {
@@ -108,6 +116,7 @@ export default {
               window.parent.postMessage({name: 'close', reference: this.reference},'*');
           }).catch((e) => {
               console.error(e);
+              this.closing = true;
           });
       }
   },
