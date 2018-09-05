@@ -19,7 +19,7 @@
 
             <v-progress-circular v-if="closing"
                     indeterminate
-                    color="primary"
+                    color="red"
             ></v-progress-circular>
 
             <v-btn v-else icon @click="closeDialog">
@@ -116,7 +116,7 @@ export default {
               window.parent.postMessage({name: 'close', reference: this.reference},'*');
           }).catch((e) => {
               console.error(e);
-              this.closing = true;
+              window.parent.postMessage({name: 'close', reference: this.reference},'*');
           });
       }
   },
