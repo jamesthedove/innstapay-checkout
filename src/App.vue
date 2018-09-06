@@ -108,16 +108,21 @@ export default {
 
       },
       closeDialog(){
-          this.closing = true;
-          axios.post(Config.baseUrl + Config.cancelTransactionUrl, {
-              ref: this.reference
-          }).then((response) => {
-              console.log(response);
-              window.parent.postMessage({name: 'close', reference: this.reference},'*');
-          }).catch((e) => {
-              console.error(e);
-              window.parent.postMessage({name: 'close', reference: this.reference},'*');
-          });
+          if (!window.transactionCompleted){
+              this.closing = true;
+              axios.post(Config.baseUrl + Config.cancelTransactionUrl, {
+                  ref: this.reference
+              }).then((response) => {
+                  console.log(response);
+                  window.parent.postMessage({name: 'close', reference: this.reference},'*');
+              }).catch((e) => {
+                  console.error(e);
+                  window.parent.postMessage({name: 'close', reference: this.reference},'*');
+              });
+          } else {
+              window.parent.postMessage({name: 'done'},'*');
+          }
+
       }
   },
   mounted(){

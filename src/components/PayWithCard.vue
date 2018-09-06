@@ -102,6 +102,7 @@ export default {
                   if (data.status === 'success' && data.action === 'done'){
                       this.successMessage = data.message;
                       this.success = true;
+                      window.transactionCompleted = true;
                       window.parent.postMessage({name: 'done', reference: this.reference},'*');
 
                   }
