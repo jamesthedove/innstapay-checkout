@@ -2,7 +2,7 @@
   <v-card>
     <v-card-text class="pt-4">
       <div class="text-xs-center">
-        <h3 class="red--text">₦ {{amount}}</h3>
+        <h3 class="red--text">₦ {{amountText}}</h3>
       </div>
       <template v-if="error">
         <v-alert outline color="error" icon="warning" :value="error">
@@ -52,6 +52,7 @@ import axios from 'axios'
 import cryptico from 'cryptico';
 import validator from 'card-validator'
 import Config from '../config'
+import Utilities from '../utilities';
 export default {
   name: 'PayWithCard',
   data: function () {
@@ -68,6 +69,7 @@ export default {
         successMessage: '',
         cardLoading: false,
         otpLoading: false,
+        amountText: '',
         error: '',
         creditCardRules: [
              (value) =>
@@ -191,6 +193,9 @@ export default {
 
   },
   mounted(){
+
+      this.amountText = Utilities.getCommaSeparatedNumber(this.amount.toString());
+
       new Card({
           // a selector or DOM element for the form where users will
           // be entering their information
