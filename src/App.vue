@@ -162,10 +162,16 @@ export default {
 
 
           }).catch((e) => {
-              console.error(e.response);
+              this.loading = false;
+              if (!e.status) {
+                  // network error
+                  //TODO retry
+                  this.error = 'A network error occurred. Please Try refreshing the page.';
+                  return;
+              }
+
               const response = e.response.data;
               this.error = response.message;
-              this.loading = false;
           })
       })
 
