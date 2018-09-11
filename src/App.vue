@@ -5,6 +5,11 @@
       <v-layout class="text-xs-center" v-if="loading" flex align-center justify-center>
         <div class="lds-css ng-scope"><div style="width:100%;height:100%" class="lds-double-ring"><div></div><div></div></div></div>
       </v-layout>
+      <template v-else-if="error">
+          <v-alert outline color="error" icon="warning" :value="error">
+            {{error}}
+          </v-alert>
+      </template>
       <v-layout v-else flex align-center justify-center>
         <v-flex xs12 sm6 elevation-6>
           <v-toolbar
@@ -156,6 +161,11 @@ export default {
               }
 
 
+          }).catch((e) => {
+              console.error(e.response);
+              const response = e.response.data;
+              this.error = response.message;
+              this.loading = false;
           })
       })
 
