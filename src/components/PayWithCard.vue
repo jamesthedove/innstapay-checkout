@@ -29,7 +29,7 @@
 
         </v-form>
         <div class="text-xs-center">
-          <v-btn :loading="cardLoading" @click="pay" round color="primary" dark>Pay</v-btn>
+          <v-btn :loading="loading" @click="pay" round color="primary" dark>Pay</v-btn>
         </div>
       </template>
 
@@ -67,7 +67,7 @@ export default {
         otpData: Object,
         success: false,
         successMessage: '',
-        cardLoading: false,
+        loading: false,
         otpLoading: false,
         amountText: '',
         error: '',
@@ -121,14 +121,14 @@ export default {
       },
       pay(){
           // if the pin was requested dont validate form, just send the pin in the request
-          if (((this.otp && this.otpData) || this.$refs.form.validate()) && !this.cardLoading) {
+          if (((this.otp && this.otpData) || this.$refs.form.validate()) && !this.loading) {
               new Fingerprint().get((result) => {
 
                   const a = this.expiry.split('/');
                   const month = a[0].replace(/\s/g, '')
                   const year = a[1].replace(/\s/g, '')
 
-                  this.cardLoading = true
+                  this.loading = true
                   const payload = {
                       no: this.number.replace(/\s/g, ''),
                       cvv: this.cvv,
@@ -171,7 +171,7 @@ export default {
 
 
                   }).catch((e) => {
-                      this.cardLoading = false
+                      this.loading = false
 
                       const response = e.response.data;
 

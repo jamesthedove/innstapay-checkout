@@ -40,16 +40,25 @@
                     slider-color="yellow"
             >
               <v-tab
+                      v-if="merchantServices.indexOf('card') > -1"
                       key="card"
                       href="#tab-card"
               >
                Card
               </v-tab>
               <v-tab
+                      v-if="merchantServices.indexOf('bank') > -1"
                       key="ussd"
                       href="#tab-ussd"
               >
-                BANK
+                Bank
+              </v-tab>
+              <v-tab
+                      v-if="merchantServices.indexOf('qr') > -1"
+                      key="qr"
+                      href="#tab-qr"
+              >
+                Qr
               </v-tab>
             </v-tabs>
           </v-toolbar>
@@ -66,6 +75,12 @@
                     key="ussd"
             >
              <pay-with-ussd :reference="reference" :banks="banks" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-ussd>
+            </v-tab-item>
+            <v-tab-item
+                    id="tab-qr"
+                    key="qr"
+            >
+              <pay-with-qr :reference="reference" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-qr>
             </v-tab-item>
           </v-tabs-items>
         </v-flex>
@@ -84,10 +99,12 @@ import Utilites from './utilities'
 import PayWithCard from './components/PayWithCard'
 import PayWithUssd from './components/PayWithUssd'
 import Fingerprint from 'fingerprintjs2'
+import PayWithQr from "./components/PayWithQr";
 
 export default {
   name: 'App',
   components: {
+      PayWithQr,
       PayWithUssd,
       PayWithCard
   },
@@ -104,6 +121,7 @@ export default {
       banks: [],
       reference: '',
       id: '',
+      error: '',
       inline: true,
       closing: false
     }
@@ -140,11 +158,12 @@ export default {
       new Fingerprint().get((result) => {
           axios.get(Config.baseUrl+Config.initialiseTransactionUrl,{
               params: {
-                  k: this.merchantPublicKey,
-                  a: this.amount,
-                  e: this.userEmail,
+                  k: this.merchantPublicKey || 'remove this',
+                  a: this.amount || 100,
+                  e: this.userEmail || 'jamesth@gma.com',
                   id: this.id,
-                  f: result
+                  f: result,
+                  wv: Config.version
               }
           }).then((response) => {
               const data = response.data;
@@ -158,6 +177,7 @@ export default {
                   this.banks = data.banks;
                   this.loading = false;
                   this.reference = data.ref;
+
               }
 
 
