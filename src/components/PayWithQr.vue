@@ -83,7 +83,7 @@ export default {
               this.qrImage = data.image;
           }
 
-          document.addEventListener('payment_success', function () {
+          document.addEventListener('payment_success',  () => {
               console.log('payment success');
               this.successMessage = 'Payment was successful';
               window.parent.postMessage({name: 'done', reference: this.reference},'*');
