@@ -47,7 +47,6 @@
 </template>
 
 <script>
-import Fingerprint from 'fingerprintjs2'
 import axios from 'axios'
 import cryptico from 'cryptico';
 import validator from 'card-validator'
@@ -96,10 +95,11 @@ export default {
             this.pay();
           } else if (this.otp){
               this.otpData.value = this.otp;
-              this.otpLoading = true
+              this.otpData.fingerprint = this.fingerprint;
+              this.otpLoading = true;
               axios.post(Config.baseUrl+Config.continueUrl,this.otpData).then((response) => {
                   const data = response.data;
-                  this.otpLoading = false
+                  this.otpLoading = false;
 
                   if (data.status === 'success' && data.action === 'done'){
                       this.successMessage = data.message;
@@ -122,64 +122,60 @@ export default {
       pay(){
           // if the pin was requested dont validate form, just send the pin in the request
           if (((this.otp && this.otpData) || this.$refs.form.validate()) && !this.loading) {
-              new Fingerprint().get((result) => {
+              const a = this.expiry.split('/');
+              const month = a[0].replace(/\s/g, '');
+              const year = a[1].replace(/\s/g, '');
 
-                  const a = this.expiry.split('/');
-                  const month = a[0].replace(/\s/g, '')
-                  const year = a[1].replace(/\s/g, '')
+              const payload = {
+                  no: this.number.replace(/\s/g, ''),
+                  cvv: this.cvv,
+                  month: month,
+                  year: year,
+                  ref: this.reference,
+                  amount: this.amount,
+                  email: this.email,
+                  merchantPKey: this.pkey,
+                  fingerprint: this.fingerprint
+              };
+              if (this.otp && this.otpData && this.otpData.action === 'pin'){
+                  // This means the pin was requested in the initial request
+                  payload.pin = this.otp;
+              }
+              const encryptedPayload = cryptico.encrypt(JSON.stringify(payload), Config.publicKey).cipher;
 
-                  this.loading = true
-                  const payload = {
-                      no: this.number.replace(/\s/g, ''),
-                      cvv: this.cvv,
-                      month: month,
-                      year: year,
-                      ref: this.reference,
-                      amount: this.amount,
-                      email: this.email,
-                      merchantPKey: this.pkey,
-                      fingerprint: result
-                  };
-                  if (this.otp && this.otpData && this.otpData.action === 'pin'){
-                      // This means the pin was requested in the initial request
-                      payload.pin = this.otp;
+              axios.post(Config.baseUrl+Config.chargeUrl, {payload: encryptedPayload} ).then((response) => {
+                  const data = response.data;
+                  if (data.status === 'success'){
+                      if (data.action === 'otp' || data.action === 'pin'){
+                          this.otpLabel = data.message;
+                          this.otpHint =  data.action === 'pin' ? 'Card pin' : 'OTP';
+                          this.otpData = {
+                              ref: data.ref,
+                              action: data.action
+                          };
+                          this.target = 'otp'; //otp can either by PIN or OTP
+                          this.$refs.otp.focus()
+                      } else if(data.action === 'done'){
+                          this.successMessage = data.message;
+                          this.success = true;
+
+                          window.parent.postMessage({name: 'done', reference: this.reference},'*');
+
+                      }
+                  } else if(data.status === 'error') {
+                      this.error = data.message;
                   }
-                  const encryptedPayload = cryptico.encrypt(JSON.stringify(payload), Config.publicKey).cipher;
-
-                  axios.post(Config.baseUrl+Config.chargeUrl, {payload: encryptedPayload} ).then((response) => {
-                      const data = response.data;
-                      if (data.status === 'success'){
-                          if (data.action === 'otp' || data.action === 'pin'){
-                              this.otpLabel = data.message;
-                              this.otpHint =  data.action === 'pin' ? 'Card pin' : 'OTP';
-                              this.otpData = {
-                                  ref: data.ref,
-                                  action: data.action
-                              };
-                              this.target = 'otp'; //otp can either by PIN or OTP
-                              this.$refs.otp.focus()
-                          } else if(data.action === 'done'){
-                              this.successMessage = data.message;
-                              this.success = true;
-
-                              window.parent.postMessage({name: 'done', reference: this.reference},'*');
-
-                          }
-                      } else if(data.status === 'error') {
-                          this.error = data.message;
-                      }
 
 
-                  }).catch((e) => {
-                      this.loading = false
+              }).catch((e) => {
+                  this.loading = false
 
-                      const response = e.response.data;
+                  const response = e.response.data;
 
-                      if (!response.status){
-                          this.error = response.message;
-                      }
-                  })
-              })
+                  if (!response.status){
+                      this.error = response.message;
+                  }
+              });
           }
 
 
@@ -189,7 +185,8 @@ export default {
     pkey: String,
     amount: 0,
     email: String,
-    reference: String
+    reference: String,
+    fingerprint: String
 
   },
   mounted(){
@@ -221,7 +218,7 @@ export default {
 
           // Default placeholders for rendered fields - optional
           placeholders: {
-              name: 'Name',
+              name: '',
               expiry: '••/••',
               cvc: '•••'
           },

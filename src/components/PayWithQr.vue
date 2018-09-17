@@ -35,7 +35,6 @@
 </template>
 
 <script>
-import Fingerprint from 'fingerprintjs2'
 import axios from 'axios'
 import Config from '../config'
 import Utilities from '../utilities';
@@ -60,28 +59,32 @@ export default {
     pkey: String,
     amount: 0,
     email: String,
-    reference: String
+    reference: String,
+    fingerprint: String
 
-  },
+    },
   mounted(){
 
       this.amountText = Utilities.getCommaSeparatedNumber(this.amount.toString());
 
-      new Fingerprint().get((result) => {
-          axios.post(Config.baseUrl+Config.getQrPath, {
-            fingerprint: result,
-            ref: this.reference,
-            amount: this.amount
-          }).then((response) => {
-              const data = response.data;
-              this.qrLoading = false;
+      axios.post(Config.baseUrl+Config.getQrPath, {
+          fingerprint: this.fingerprint,
+          ref: this.reference,
+          wv: Config.version,
+          amount: this.amount
+      }).then((response) => {
+          const data = response.data;
+          this.qrLoading = false;
 
-              if (data.status === 'success'){
-                this.qrImage = data.image;
-              }
+          if (data.status === 'success'){
+              this.qrImage = data.image;
+          }
+
+          document.addEventListener('payment_success', function () {
+              console.log('payment success');
+
           })
-      });
-
+      })
 
 
 

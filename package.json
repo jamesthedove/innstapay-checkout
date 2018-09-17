@@ -14,6 +14,7 @@
     "cryptico": "^1.0.2",
     "fingerprintjs2": "^1.8.1",
     "payment": "^2.1.4",
+    "pusher-js": "^4.3.1",
     "vue": "^2.5.17",
     "vuetify": "^1.0.19"
   },
