@@ -14,7 +14,10 @@
       </template>
 
       <template v-else-if="success">
-        <h3>{{successMessage}}</h3>
+        <v-flex class="text-xs-center">
+          <v-icon color="green" x-large>check</v-icon>
+          <h3>{{successMessage}}</h3>
+        </v-flex>
       </template>
       <template v-else-if="target === 'card'">
 

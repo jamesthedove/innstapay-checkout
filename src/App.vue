@@ -181,7 +181,6 @@ export default {
           channel.bind('payment_success', function(data) {
               const event = new Event('payment_success');
               document.dispatchEvent(event);
-              alert(JSON.stringify(data));
           });
       }
   },

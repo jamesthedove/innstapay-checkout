@@ -13,8 +13,11 @@
         </div>
       </template>
 
-      <template v-else-if="success">
-        <h3>{{successMessage}}</h3>
+      <template v-else-if="successMessage">
+        <v-flex class="text-xs-center">
+          <v-icon color="green" x-large>check</v-icon>
+          <h3>{{successMessage}}</h3>
+        </v-flex>
       </template>
       <template v-else>
 
@@ -82,6 +85,8 @@ export default {
 
           document.addEventListener('payment_success', function () {
               console.log('payment success');
+              this.successMessage = 'Payment was successful';
+              window.parent.postMessage({name: 'done', reference: this.reference},'*');
 
           })
       })
