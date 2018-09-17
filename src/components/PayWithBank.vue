@@ -109,7 +109,10 @@ export default {
       },
       openWindow(){
 
-          window.open(this.initialResponse.url, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+          const win = window.open(this.initialResponse.url, '_blank');
+          win.focus();
+
+//          window.open(this.initialResponse.url, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
 
 
           window.onfocus = ()=> {
