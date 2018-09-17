@@ -5,7 +5,7 @@ const urls = [
     'http://localhost:4667/payments/v1/', 'https://api.innstapay.com/payments/v1/'
 ];
 export default {
-    baseUrl: urls[0],
+    baseUrl: urls[1],
     version: require('../package.json').version,
     chargeUrl: `initiateCharge`,
     chargeBankUrl: `initiateBankCharge`,
