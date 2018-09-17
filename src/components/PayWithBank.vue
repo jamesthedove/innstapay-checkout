@@ -109,10 +109,15 @@ export default {
       },
       openWindow(){
 
-          const win = window.open(this.initialResponse.url, '_blank');
-          win.focus();
 
-//          window.open(this.initialResponse.url, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+          const f = $("<form target='_blank' style='display:none;'></form>").attr({
+              action: this.initialResponse.url
+          }).appendTo(document.body);
+
+
+          f.submit();
+
+          f.remove();
 
 
           window.onfocus = ()=> {
