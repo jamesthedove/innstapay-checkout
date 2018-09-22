@@ -172,13 +172,20 @@ export default {
 
 
               }).catch((e) => {
-                  this.loading = false
+                  this.loading = false;
 
-                  const response = e.response.data;
+                  if (e.response){
 
-                  if (!response.status){
-                      this.error = response.message;
+                      if (e.response.status){
+                          const response = e.response.data;
+                          this.error = response.message;
+                      } else {
+                          this.error = 'A network error occurred'
+                      }
+                  } else {
+                      console.error(e);
                   }
+
               });
           }
 
