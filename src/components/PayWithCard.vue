@@ -125,6 +125,7 @@ export default {
       pay(){
           // if the pin was requested dont validate form, just send the pin in the request
           if (((this.otp && this.otpData) || this.$refs.form.validate()) && !this.loading) {
+              this.loading = true;
               const a = this.expiry.split('/');
               const month = a[0].replace(/\s/g, '');
               const year = a[1].replace(/\s/g, '');
