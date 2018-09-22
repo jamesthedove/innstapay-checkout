@@ -38,7 +38,7 @@
 
       <template v-else>
         <h3><b>{{otpLabel}}</b></h3>
-        <v-text-field ref="otp" :label="otpHint" @keyup.enter="verifyOtp" v-model="otp"></v-text-field>
+        <v-text-field ref="otpField" :label="otpHint" @keyup.enter="verifyOtp" v-model="otp"></v-text-field>
         <div class="text-xs-center">
           <v-btn :loading="otpLoading" @click="verifyOtp" round color="primary" dark>Pay</v-btn>
         </div>
@@ -158,7 +158,7 @@ export default {
                               action: data.action
                           };
                           this.target = 'otp'; //otp can either by PIN or OTP
-                          this.$refs.otp.focus()
+                          this.$refs.otpField.focus()
                       } else if(data.action === 'done'){
                           this.successMessage = data.message;
                           this.success = true;
@@ -188,7 +188,6 @@ export default {
 
               });
           }
-
 
       }
     },

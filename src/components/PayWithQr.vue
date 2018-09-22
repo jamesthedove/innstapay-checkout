@@ -70,26 +70,26 @@ export default {
 
       this.amountText = Utilities.getCommaSeparatedNumber(this.amount.toString());
 
-      axios.post(Config.baseUrl+Config.getQrPath, {
-          fingerprint: this.fingerprint,
-          ref: this.reference,
-          wv: Config.version,
-          amount: this.amount
-      }).then((response) => {
-          const data = response.data;
-          this.qrLoading = false;
-
-          if (data.status === 'success'){
-              this.qrImage = data.image;
-          }
-
-          document.addEventListener('payment_success',  () => {
-              console.log('payment success');
-              this.successMessage = 'Payment was successful';
-              window.parent.postMessage({name: 'done', reference: this.reference},'*');
-
-          })
-      })
+//      axios.post(Config.baseUrl+Config.getQrPath, {
+//          fingerprint: this.fingerprint,
+//          ref: this.reference,
+//          wv: Config.version,
+//          amount: this.amount
+//      }).then((response) => {
+//          const data = response.data;
+//          this.qrLoading = false;
+//
+//          if (data.status === 'success'){
+//              this.qrImage = data.image;
+//          }
+//
+//          document.addEventListener('payment_success',  () => {
+//              console.log('payment success');
+//              this.successMessage = 'Payment was successful';
+//              window.parent.postMessage({name: 'done', reference: this.reference},'*');
+//
+//          })
+//      })
 
 
 
