@@ -1,11 +1,8 @@
 /**
  * Created by James Falade on 16/08/2018.
  */
-const urls = [
-    'http://localhost:4667/payments/v1/', 'https://api.innstapay.com/payments/v1/'
-];
 export default {
-    baseUrl: urls[1],
+    baseUrl: process.env.VUE_APP_BASE_URL,
     version: require('../package.json').version,
     chargeUrl: `initiateCharge`,
     chargeBankUrl: `initiateBankCharge`,
