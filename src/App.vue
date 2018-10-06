@@ -172,7 +172,7 @@ export default {
           // Enable pusher logging - don't include this in production
           Pusher.logToConsole = true;
 
-          const pusher = new Pusher('eccc640704e9a7ebb3b7', {
+          const pusher = new Pusher(process.env.VUE_APP_PUSHER_KEY, {
               cluster: 'us2',
               forceTLS: true
           });
