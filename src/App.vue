@@ -191,6 +191,23 @@ export default {
     this.amount = Utilites.getParameterByName('a');
     this.inline = !this.id;
 
+    let merchantServices;
+
+    if (Utilites.getParameterByName('c') || Utilites.getParameterByName('b') || Utilites.getParameterByName('q')){
+        merchantServices = [];
+
+        if(parseInt(Utilites.getParameterByName('c')) > -1){
+            merchantServices.push('card')
+        }
+         if(parseInt(Utilites.getParameterByName('b')) > -1){
+            merchantServices.push('bank')
+        }
+         if(parseInt(Utilites.getParameterByName('q')) > -1){
+            merchantServices.push('qr')
+        }
+
+    }
+
       new Fingerprint().get((result) => {
           this.fingerprint = result;
           axios.get(Config.baseUrl+Config.initialiseTransactionUrl,{
@@ -210,7 +227,7 @@ export default {
                   }
                   this.merchantName = data.name;
                   this.merchantLogo = data.logo;
-                  this.merchantServices = data.services;
+                  this.merchantServices =  merchantServices || data.services; //TODO make sure the merchantServices is present in the data.services
                   this.banks = data.banks;
                   this.loading = false;
                   this.reference = data.ref;
