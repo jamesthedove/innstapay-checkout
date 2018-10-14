@@ -169,9 +169,10 @@ export default {
 
       },
       initialiseWebSocket(){
-          // Enable pusher logging - don't include this in production
-          Pusher.logToConsole = true;
-
+          if (process.env.NODE_ENV === 'DEV'){
+              // Enable pusher logging - don't include this in production
+              Pusher.logToConsole = true;
+          }
           const pusher = new Pusher(process.env.VUE_APP_PUSHER_KEY, {
               cluster: 'us2',
               forceTLS: true
