@@ -38,7 +38,7 @@
 
       <template v-else>
         <h3><b>{{otpLabel}}</b></h3>
-        <v-text-field ref="otpField" :label="otpHint" @keyup.enter="verifyOtp" v-model="otp"></v-text-field>
+        <v-text-field ref="otpField" type="password" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" :label="otpHint" @keyup.enter="verifyOtp" v-model="otp"></v-text-field>
         <div class="text-xs-center">
           <v-btn :loading="otpLoading" @click="verifyOtp" round color="primary" dark>Pay</v-btn>
         </div>
@@ -151,6 +151,10 @@ export default {
                   const data = response.data;
                   if (data.status === 'success'){
                       if (data.action === 'otp' || data.action === 'pin'){
+
+                          //reset otp
+                          this.otp = '';
+
                           this.otpLabel = data.message;
                           this.otpHint =  data.action === 'pin' ? 'Card pin' : 'OTP';
                           this.otpData = {

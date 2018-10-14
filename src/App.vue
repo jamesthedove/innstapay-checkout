@@ -74,6 +74,7 @@
               <v-tab
                       v-if="merchantServices.indexOf('qr') > -1"
                       key="qr"
+                      @click="qrClicked"
                       href="#tab-qr"
               >
                 Qr
@@ -149,6 +150,10 @@ export default {
     }
   },
   methods: {
+      qrClicked(){
+         console.log('qr clicked');
+         document.dispatchEvent(new Event("getQr"));
+      },
       pay(){
 
       },
