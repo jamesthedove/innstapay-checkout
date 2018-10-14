@@ -140,6 +140,8 @@ export default {
       banks: [],
       reference: '',
       id: '',
+      shippingCharges: '',
+      metadata: null,
       error: '',
       fingerprint: '',
       inline: true,
@@ -170,7 +172,6 @@ export default {
       },
       initialiseWebSocket(){
           if (process.env.NODE_ENV === 'DEV'){
-              // Enable pusher logging - don't include this in production
               Pusher.logToConsole = true;
           }
           const pusher = new Pusher(process.env.VUE_APP_PUSHER_KEY, {
@@ -190,6 +191,8 @@ export default {
     this.merchantPublicKey = Utilites.getParameterByName('k');
     this.userEmail = Utilites.getParameterByName('e');
     this.amount = Utilites.getParameterByName('a');
+    this.shippingCharges = Utilites.getParameterByName('shch');
+    this.metadata = Utilites.getParameterByName('metadata');
     this.inline = !this.id;
 
     let merchantServices;
@@ -218,6 +221,8 @@ export default {
                   e: this.userEmail,
                   id: this.id,
                   f: result,
+                  shch: this.shippingCharges,
+                  metadata: this.metadata,
                   wv: Config.version
               }
           }).then((response) => {
