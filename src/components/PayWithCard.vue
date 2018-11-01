@@ -1,5 +1,8 @@
 <template>
   <v-card>
+    <v-alert outline color="warning" icon="warning" :value="true">
+      This is a test environment. Please use test cards only.
+    </v-alert>
     <v-card-text class="pt-4">
       <div class="text-xs-center">
         <h3 class="red--text">₦ {{amountText}}</h3>

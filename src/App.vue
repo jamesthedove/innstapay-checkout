@@ -1,9 +1,6 @@
 <template>
   <v-app :style="inline ? 'background: none' : ''">
 
-    <v-alert outline color="warning" icon="warning" :value="true">
-      This is a test environment. Please use test cards only.
-    </v-alert>
     <v-container fluid fill-height>
       <v-layout class="text-xs-center" v-if="loading" flex align-center justify-center>
 
