@@ -27,6 +27,9 @@
           <v-alert outline color="error" icon="warning" :value="error">
             {{error}}
           </v-alert>
+        <div v-if="inline" class="text-xs-center">
+          <v-btn @click="justCloseDialog">Close</v-btn>
+        </div>
       </template>
       <v-layout v-else flex align-center justify-center>
         <v-flex xs12 sm6 elevation-6>
@@ -149,6 +152,9 @@ export default {
   methods: {
       pay(){
 
+      },
+      justCloseDialog(){
+        window.parent.postMessage({name: 'close', reference: this.reference},'*');
       },
       closeDialog(){
           if (!window.transactionCompleted){
