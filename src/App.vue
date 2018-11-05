@@ -160,6 +160,9 @@ export default {
       pay(){
 
       },
+      justCloseDialog(){
+          window.parent.postMessage({name: 'close', reference: this.reference},'*');
+      },
       closeDialog(){
           if (!window.transactionCompleted){
               this.closing = true;
