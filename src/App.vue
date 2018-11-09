@@ -27,9 +27,9 @@
           <v-alert outline color="error" icon="warning" :value="error">
             {{error}}
           </v-alert>
-        <div v-if="inline" class="text-xs-center">
+        <v-flex v-if="inline" class="text-xs-center">
           <v-btn @click="justCloseDialog">Close</v-btn>
-        </div>
+        </v-flex>
       </template>
       <v-layout v-else flex align-center justify-center>
         <v-flex xs12 sm6 elevation-6>
@@ -240,7 +240,7 @@ export default {
               const data = response.data;
               if (data.status === 'success'){
                   if (data.amount){
-                      this.amount = parseInt(data.amount);
+                      this.amount = parseFloat(data.amount);
                   }
                   this.merchantName = data.name;
                   this.merchantLogo = data.logo;
