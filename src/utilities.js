@@ -15,8 +15,9 @@ class Utilities {
 }
 
     static getCommaSeparatedNumber(number){
-        return number.replace(/\D/g, '')
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return number.toLocaleString();
+        /*return number.replace(/\D/g, '')
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ',');*/
     }
 
 }
