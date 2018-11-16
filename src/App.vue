@@ -149,6 +149,7 @@ export default {
       error: '',
       fingerprint: '',
       inline: true,
+      paymentPage: false,
       closing: false
     }
   },
@@ -205,6 +206,13 @@ export default {
     this.shippingCharges = Utilites.getParameterByName('shch');
     this.metadata = Utilites.getParameterByName('metadata');
     this.inline = !this.id;
+
+    const path = window.location.pathname;
+    this.paymentPage = path.indexOf('/pay') > -1;
+
+    if (this.paymentPage){
+        console.log('this is a payment page');
+    }
 
     let merchantServices;
 
