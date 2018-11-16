@@ -212,6 +212,8 @@ export default {
 
     if (this.paymentPage){
         console.log('this is a payment page');
+        this.inline = false;
+        this.id  = path.substr(path.lastIndexOf('/') + 1);
     }
 
     let merchantServices;
@@ -239,6 +241,7 @@ export default {
                   a: this.amount || 100,
                   e: this.userEmail,
                   id: this.id,
+                  paymentPage: !!this.paymentPage,
                   f: result,
                   shch: this.shippingCharges,
                   metadata: this.metadata,
