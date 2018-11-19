@@ -210,83 +210,84 @@ export default {
 
     if (this.merchantPublicKey && !Utilites.inIframe()){
         this.error = 'Permission denied!';
-        return;
-    }
-    const path = window.location.pathname;
-    this.paymentPage = path.indexOf('/pay') > -1;
+    } else {
+        const path = window.location.pathname;
+        this.paymentPage = path.indexOf('/pay') > -1;
 
-    if (this.paymentPage){
-        console.log('this is a payment page');
-        this.inline = false;
-        this.id  = path.substr(path.lastIndexOf('/') + 1);
-    }
-
-    let merchantServices;
-
-    if (Utilites.getParameterByName('c') || Utilites.getParameterByName('b') || Utilites.getParameterByName('q')){
-        merchantServices = [];
-
-        if(parseInt(Utilites.getParameterByName('c')) > -1){
-            merchantServices.push('card')
-        }
-         if(parseInt(Utilites.getParameterByName('b')) > -1){
-            merchantServices.push('bank')
-        }
-         if(parseInt(Utilites.getParameterByName('q')) > -1){
-            merchantServices.push('qr')
+        if (this.paymentPage){
+            console.log('this is a payment page');
+            this.inline = false;
+            this.id  = path.substr(path.lastIndexOf('/') + 1);
         }
 
+        let merchantServices;
+
+        if (Utilites.getParameterByName('c') || Utilites.getParameterByName('b') || Utilites.getParameterByName('q')){
+            merchantServices = [];
+
+            if(parseInt(Utilites.getParameterByName('c')) > -1){
+                merchantServices.push('card')
+            }
+            if(parseInt(Utilites.getParameterByName('b')) > -1){
+                merchantServices.push('bank')
+            }
+            if(parseInt(Utilites.getParameterByName('q')) > -1){
+                merchantServices.push('qr')
+            }
+
+        }
+
+        new Fingerprint().get((result) => {
+            this.fingerprint = result;
+            axios.get(Config.baseUrl+Config.initialiseTransactionUrl,{
+                params: {
+                    k: this.merchantPublicKey,
+                    a: this.amount || 100,
+                    e: this.userEmail,
+                    id: this.id,
+                    paymentPage: this.paymentPage ? '1' : '',
+                    f: result,
+                    shch: this.shippingCharges,
+                    metadata: this.metadata,
+                    wv: Config.version
+                }
+            }).then((response) => {
+                const data = response.data;
+                if (data.status === 'success'){
+                    if (data.amount){
+                        this.amount = parseFloat(data.amount);
+                    }
+                    this.merchantName = data.name;
+                    this.merchantLogo = data.logo;
+                    this.merchantServices =  merchantServices || data.services; //TODO make sure the merchantServices is present in the data.services
+                    this.banks = data.banks;
+                    this.loading = false;
+                    this.reference = data.ref;
+
+                    this.initialiseWebSocket();
+
+                }
+
+
+            }).catch((e) => {
+                console.error(e);
+                this.loading = false;
+                if (e.response){
+                    if (!e.response.status){
+                        // network error
+                        //TODO retry
+                        this.error = 'A network error occurred. Please Try refreshing the page.';
+                    } else {
+                        const response = e.response.data;
+                        this.error = response.message;
+                    }
+                }
+
+
+            })
+        })
     }
 
-      new Fingerprint().get((result) => {
-          this.fingerprint = result;
-          axios.get(Config.baseUrl+Config.initialiseTransactionUrl,{
-              params: {
-                  k: this.merchantPublicKey,
-                  a: this.amount || 100,
-                  e: this.userEmail,
-                  id: this.id,
-                  paymentPage: this.paymentPage ? '1' : '',
-                  f: result,
-                  shch: this.shippingCharges,
-                  metadata: this.metadata,
-                  wv: Config.version
-              }
-          }).then((response) => {
-              const data = response.data;
-              if (data.status === 'success'){
-                  if (data.amount){
-                      this.amount = parseFloat(data.amount);
-                  }
-                  this.merchantName = data.name;
-                  this.merchantLogo = data.logo;
-                  this.merchantServices =  merchantServices || data.services; //TODO make sure the merchantServices is present in the data.services
-                  this.banks = data.banks;
-                  this.loading = false;
-                  this.reference = data.ref;
-
-                  this.initialiseWebSocket();
-
-              }
-
-
-          }).catch((e) => {
-              console.error(e);
-              this.loading = false;
-              if (e.response){
-                  if (!e.response.status){
-                      // network error
-                      //TODO retry
-                      this.error = 'A network error occurred. Please Try refreshing the page.';
-                  } else {
-                      const response = e.response.data;
-                      this.error = response.message;
-                  }
-              }
-
-
-          })
-      })
 
   }
 }
