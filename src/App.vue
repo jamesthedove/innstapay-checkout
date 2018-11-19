@@ -205,10 +205,11 @@ export default {
     this.amount = Utilites.getParameterByName('a');
     this.shippingCharges = Utilites.getParameterByName('shch');
     this.metadata = Utilites.getParameterByName('metadata');
-    this.inline = !this.id;
+
+    this.inline = this.merchantPublicKey;
 
 
-    if (this.merchantPublicKey && !Utilites.inIframe()){
+    if (this.inline && !Utilites.inIframe()){
         //this will make the loading spin indefinitely. This is intentional
         return;
     }
