@@ -241,7 +241,7 @@ export default {
                   a: this.amount || 100,
                   e: this.userEmail,
                   id: this.id,
-                  paymentPage: !!this.paymentPage,
+                  paymentPage: this.paymentPage ? '1' : '',
                   f: result,
                   shch: this.shippingCharges,
                   metadata: this.metadata,
