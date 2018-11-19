@@ -209,8 +209,7 @@ export default {
 
 
     if (this.merchantPublicKey && !Utilites.inIframe()){
-        this.loading = false;
-        this.error = 'Permission denied!';
+        //this will make the loading spin indefinitely. This is intentional
         return;
     }
     const path = window.location.pathname;
