@@ -20,6 +20,14 @@ class Utilities {
             .replace(/\B(?=(\d{3})+(?!\d))/g, ',');*/
     }
 
+    static inIframe () {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+    }
+
 }
 
 export default Utilities

@@ -207,6 +207,11 @@ export default {
     this.metadata = Utilites.getParameterByName('metadata');
     this.inline = !this.id;
 
+
+    if (this.merchantPublicKey && !Utilites.inIframe()){
+        this.error = 'Permission denied!';
+        return;
+    }
     const path = window.location.pathname;
     this.paymentPage = path.indexOf('/pay') > -1;
 
