@@ -32,7 +32,7 @@
         </v-flex>
       </template>
       <v-layout v-else flex align-center justify-center>
-        <v-flex xs12 sm6 elevation-6>
+        <v-flex xs12 sm6 md4 elevation-6>
           <v-toolbar
                   color="primary"
                   dark
@@ -106,10 +106,25 @@
             </v-tab-item>
           </v-tabs-items>
         </v-flex>
+
       </v-layout>
 
     </v-container>
+    <v-footer
+            dark
+            height="auto"
+    >
+      <v-card
+              class="flex"
+              flat
+              tile
+      >
 
+        <v-card-actions class="grey darken-1 justify-center">
+          Secured by Innstapay
+        </v-card-actions>
+      </v-card>
+    </v-footer>
 
   </v-app>
 </template>

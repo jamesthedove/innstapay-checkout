@@ -21,7 +21,7 @@
       </template>
       <template v-else-if="target === 'card'">
 
-        <div class='card-wrapper'></div>
+        <div style="display: none" class='card-wrapper'></div>
 
         <v-form class="pa-3 c-form" ref="form">
           <v-text-field :rules="creditCardRules" ref="number" placeholder="" id="number" length="16" v-model="number" label="Card Number"></v-text-field>
