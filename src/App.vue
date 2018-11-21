@@ -40,7 +40,7 @@
                     tabs
             >
 
-                <v-toolbar-title>{{merchantName}}</v-toolbar-title>
+                <v-toolbar-title>Please fill this form</v-toolbar-title>
             </v-toolbar>
         <checkout-form v-on:done="checkoutFormDone" :amount="amount"></checkout-form>
             </v-flex>
