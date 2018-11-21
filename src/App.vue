@@ -339,7 +339,7 @@ export default {
           this.showDetailsForm = true;
       } else {
           this.id = Utilites.getParameterByName('i');
-          this.inline = this.merchantPublicKey;
+          this.inline = !!Utilites.getParameterByName('k');
           this.initialiseTransaction();
       }
   }
