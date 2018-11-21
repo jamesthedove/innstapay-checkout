@@ -1,9 +1,12 @@
 <template>
   <v-card>
     <v-card-text class="pt-4">
-      <div class="text-xs-center">
-        <h3 class="red--text">₦ {{amountText}}</h3>
-      </div>
+      <!--<div class="text-xs-center">
+        <p>{{email}}</p>
+      </div>-->
+        <div class="text-xs-center">
+            <h3 class="red--text">₦ {{amountText}}</h3>
+        </div>
       <template v-if="error">
         <v-alert outline color="error" icon="warning" :value="error">
           {{error}}

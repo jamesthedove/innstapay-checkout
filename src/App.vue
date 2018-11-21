@@ -31,6 +31,21 @@
           <v-btn @click="justCloseDialog">Close</v-btn>
         </v-flex>
       </template>
+    <template v-else-if="showDetailsForm">
+        <v-layout flex align-center justify-center>
+            <v-flex xs12 sm6 md4 elevation-6>
+            <v-toolbar
+                    color="primary"
+                    dark
+                    tabs
+            >
+
+                <v-toolbar-title>{{merchantName}}</v-toolbar-title>
+            </v-toolbar>
+        <checkout-form v-on:done="checkoutFormDone" :amount="amount"></checkout-form>
+            </v-flex>
+        </v-layout>
+    </template>
       <v-layout v-else flex align-center justify-center>
         <v-flex xs12 sm6 md4 elevation-6>
           <v-toolbar
@@ -84,7 +99,6 @@
               </v-tab>
             </v-tabs>
           </v-toolbar>
-
           <v-tabs-items v-model="paymentMethod">
             <v-tab-item
                     id="tab-card"
@@ -136,6 +150,7 @@ import Utilites from './utilities'
 import Pusher from 'pusher-js';
 import PayWithCard from './components/PayWithCard'
 import PayWithBank from './components/PayWithBank'
+import CheckoutForm from './components/CheckoutForm'
 import Fingerprint from 'fingerprintjs2'
 import PayWithQr from "./components/PayWithQr";
 
@@ -144,7 +159,8 @@ export default {
   components: {
       PayWithQr,
       PayWithBank,
-      PayWithCard
+      PayWithCard,
+      CheckoutForm
   },
   data () {
     return {
@@ -155,7 +171,7 @@ export default {
       merchantServices: '',
       amount: 0,
       merchantPublicKey: '',
-      userEmail: '',
+      userEmail: '', userPhone: '', userFirstName: '', userLastName: '',
       banks: [],
       reference: '',
       id: '',
@@ -165,10 +181,19 @@ export default {
       fingerprint: '',
       inline: true,
       paymentPage: false,
-      closing: false
+      closing: false,
+      showDetailsForm: false
     }
   },
   methods: {
+      checkoutFormDone(details){
+        this.showDetailsForm = false;
+        this.userEmail = details.email;
+        this.userFirstName = details.firstName;
+        this.userLastName = details.lastName;
+        this.userPhone = details.phone;
+      },
+
       qrClicked(){
          console.log('qr clicked');
          document.dispatchEvent(new Event("getQr"));
@@ -217,6 +242,9 @@ export default {
     this.id = Utilites.getParameterByName('i');
     this.merchantPublicKey = Utilites.getParameterByName('k');
     this.userEmail = Utilites.getParameterByName('e');
+    this.userFirstName = Utilites.getParameterByName('fn');
+    this.userLastName = Utilites.getParameterByName('ln');
+    this.userPhone = Utilites.getParameterByName('p');
     this.amount = Utilites.getParameterByName('a');
     this.shippingCharges = Utilites.getParameterByName('shch');
     this.metadata = Utilites.getParameterByName('metadata');
@@ -261,6 +289,9 @@ export default {
                   k: this.merchantPublicKey,
                   a: this.amount || 100,
                   e: this.userEmail,
+                  p: this.userPhone,
+                  fn: this.userFirstName,
+                  ln: this.userLastName,
                   id: this.id,
                   paymentPage: this.paymentPage ? '1' : '',
                   f: result,
@@ -282,6 +313,10 @@ export default {
                   this.reference = data.ref;
 
                   this.initialiseWebSocket();
+
+                  if(this.paymentPage){
+                      this.showDetailsForm = true;
+                  }
 
               }
 
