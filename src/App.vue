@@ -165,7 +165,7 @@ export default {
   data () {
     return {
       paymentMethod: 'card',
-      loading: true,
+      loading: false,
       merchantName: '',
       merchantLogo: '',
       merchantServices: '',
@@ -192,6 +192,7 @@ export default {
         this.userFirstName = details.firstName;
         this.userLastName = details.lastName;
         this.userPhone = details.phone;
+        this.initialiseTransaction();
       },
 
       qrClicked(){
@@ -236,109 +237,111 @@ export default {
               const event = new Event('payment_success');
               document.dispatchEvent(event);
           });
+      },
+      initialiseTransaction(){
+          this.loading = true;
+          this.merchantPublicKey = Utilites.getParameterByName('k');
+          this.userEmail = Utilites.getParameterByName('e');
+          this.userFirstName = Utilites.getParameterByName('fn');
+          this.userLastName = Utilites.getParameterByName('ln');
+          this.userPhone = Utilites.getParameterByName('p');
+          this.amount = Utilites.getParameterByName('a');
+          this.shippingCharges = Utilites.getParameterByName('shch');
+          this.metadata = Utilites.getParameterByName('metadata');
+
+
+
+          if (this.inline && !Utilites.inIframe()){
+              //this will make the loading spin indefinitely. This is intentional
+              return;
+          }
+
+
+          let merchantServices;
+
+          if (Utilites.getParameterByName('c') || Utilites.getParameterByName('b') || Utilites.getParameterByName('q')){
+              merchantServices = [];
+
+              if(parseInt(Utilites.getParameterByName('c')) > -1){
+                  merchantServices.push('card')
+              }
+              if(parseInt(Utilites.getParameterByName('b')) > -1){
+                  merchantServices.push('bank')
+              }
+              if(parseInt(Utilites.getParameterByName('q')) > -1){
+                  merchantServices.push('qr')
+              }
+
+          }
+
+          new Fingerprint().get((result) => {
+              this.fingerprint = result;
+              axios.get(Config.baseUrl+Config.initialiseTransactionUrl,{
+                  params: {
+                      k: this.merchantPublicKey,
+                      a: this.amount || 100,
+                      e: this.userEmail,
+                      p: this.userPhone,
+                      fn: this.userFirstName,
+                      ln: this.userLastName,
+                      id: this.id,
+                      paymentPage: this.paymentPage ? '1' : '',
+                      f: result,
+                      shch: this.shippingCharges,
+                      metadata: this.metadata,
+                      wv: Config.version
+                  }
+              }).then((response) => {
+                  const data = response.data;
+                  if (data.status === 'success'){
+                      if (data.amount){
+                          this.amount = parseFloat(data.amount);
+                      }
+                      this.merchantName = data.name;
+                      this.merchantLogo = data.logo;
+                      this.merchantServices =  merchantServices || data.services; //TODO make sure the merchantServices is present in the data.services
+                      this.banks = data.banks;
+                      this.loading = false;
+                      this.reference = data.ref;
+
+                      this.initialiseWebSocket();
+
+                  }
+
+
+              }).catch((e) => {
+                  console.error(e);
+                  this.loading = false;
+                  if (e.response){
+                      if (!e.response.status){
+                          // network error
+                          //TODO retry
+                          this.error = 'A network error occurred. Please Try refreshing the page.';
+                      } else {
+                          const response = e.response.data;
+                          this.error = response.message;
+                      }
+                  }
+
+
+              })
+          })
       }
   },
-  mounted(){
-    this.id = Utilites.getParameterByName('i');
-    this.merchantPublicKey = Utilites.getParameterByName('k');
-    this.userEmail = Utilites.getParameterByName('e');
-    this.userFirstName = Utilites.getParameterByName('fn');
-    this.userLastName = Utilites.getParameterByName('ln');
-    this.userPhone = Utilites.getParameterByName('p');
-    this.amount = Utilites.getParameterByName('a');
-    this.shippingCharges = Utilites.getParameterByName('shch');
-    this.metadata = Utilites.getParameterByName('metadata');
+  async mounted(){
+      const path = window.location.pathname;
+      this.paymentPage = path.indexOf('/pay') > -1;
 
-    this.inline = this.merchantPublicKey;
-
-
-    if (this.inline && !Utilites.inIframe()){
-        //this will make the loading spin indefinitely. This is intentional
-        return;
-    }
-    const path = window.location.pathname;
-    this.paymentPage = path.indexOf('/pay') > -1;
-
-    if (this.paymentPage){
-        console.log('this is a payment page');
-        this.inline = false;
-        this.id  = path.substr(path.lastIndexOf('/') + 1);
-    }
-
-    let merchantServices;
-
-    if (Utilites.getParameterByName('c') || Utilites.getParameterByName('b') || Utilites.getParameterByName('q')){
-        merchantServices = [];
-
-        if(parseInt(Utilites.getParameterByName('c')) > -1){
-            merchantServices.push('card')
-        }
-         if(parseInt(Utilites.getParameterByName('b')) > -1){
-            merchantServices.push('bank')
-        }
-         if(parseInt(Utilites.getParameterByName('q')) > -1){
-            merchantServices.push('qr')
-        }
-
-    }
-
-      new Fingerprint().get((result) => {
-          this.fingerprint = result;
-          axios.get(Config.baseUrl+Config.initialiseTransactionUrl,{
-              params: {
-                  k: this.merchantPublicKey,
-                  a: this.amount || 100,
-                  e: this.userEmail,
-                  p: this.userPhone,
-                  fn: this.userFirstName,
-                  ln: this.userLastName,
-                  id: this.id,
-                  paymentPage: this.paymentPage ? '1' : '',
-                  f: result,
-                  shch: this.shippingCharges,
-                  metadata: this.metadata,
-                  wv: Config.version
-              }
-          }).then((response) => {
-              const data = response.data;
-              if (data.status === 'success'){
-                  if (data.amount){
-                      this.amount = parseFloat(data.amount);
-                  }
-                  this.merchantName = data.name;
-                  this.merchantLogo = data.logo;
-                  this.merchantServices =  merchantServices || data.services; //TODO make sure the merchantServices is present in the data.services
-                  this.banks = data.banks;
-                  this.loading = false;
-                  this.reference = data.ref;
-
-                  this.initialiseWebSocket();
-
-                  if(this.paymentPage){
-                      this.showDetailsForm = true;
-                  }
-
-              }
-
-
-          }).catch((e) => {
-              console.error(e);
-              this.loading = false;
-              if (e.response){
-                  if (!e.response.status){
-                      // network error
-                      //TODO retry
-                      this.error = 'A network error occurred. Please Try refreshing the page.';
-                  } else {
-                      const response = e.response.data;
-                      this.error = response.message;
-                  }
-              }
-
-
-          })
-      })
-
+      if (this.paymentPage){
+          console.log('this is a payment page');
+          this.inline = false;
+          this.id  = path.substr(path.lastIndexOf('/') + 1);
+          this.showDetailsForm = true;
+      } else {
+          this.id = Utilites.getParameterByName('i');
+          this.inline = this.merchantPublicKey;
+          this.initialiseTransaction();
+      }
   }
 }
 </script>

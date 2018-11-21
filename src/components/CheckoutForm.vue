@@ -1,9 +1,6 @@
 <template>
   <v-card>
     <v-card-text class="pt-4">
-      <div class="text-xs-center">
-        <h3 class="red--text">₦ {{amountText}}</h3>
-      </div>
 
 
         <v-form class="pa-3 c-form" ref="form">
