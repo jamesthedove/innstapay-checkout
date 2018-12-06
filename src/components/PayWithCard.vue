@@ -2,12 +2,12 @@
   <v-card>
 
     <v-card-text class="pt-4">
-      <v-alert outline color="warning" icon="warning" :value="true">
-        This is a test environment. Please use test cards only.
-      </v-alert>
-      <div class="text-xs-center">
-        <h3 class="red--text">₦ {{amountText}}</h3>
-      </div>
+      <!--<div class="text-xs-center">
+        <p>{{email}}</p>
+      </div>-->
+        <div class="text-xs-center">
+            <h3 class="red--text">₦ {{amountText}}</h3>
+        </div>
       <template v-if="error">
         <v-alert outline color="error" icon="warning" :value="error">
           {{error}}
@@ -25,7 +25,7 @@
       </template>
       <template v-else-if="target === 'card'">
 
-        <div class='card-wrapper'></div>
+        <div style="display: none" class='card-wrapper'></div>
 
         <v-form class="pa-3 c-form" ref="form">
           <v-text-field :rules="creditCardRules" ref="number" placeholder="" id="number" length="16" v-model="number" label="Card Number"></v-text-field>
@@ -42,7 +42,7 @@
 
       <template v-else>
         <h3><b>{{otpLabel}}</b></h3>
-        <v-text-field ref="otpField" :label="otpHint" @keyup.enter="verifyOtp" v-model="otp"></v-text-field>
+        <v-text-field ref="otpField" type="password" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" :label="otpHint" @keyup.enter="verifyOtp" v-model="otp"></v-text-field>
         <div class="text-xs-center">
           <v-btn :loading="otpLoading" @click="verifyOtp" round color="primary" dark>Pay</v-btn>
         </div>
@@ -155,6 +155,10 @@ export default {
                   const data = response.data;
                   if (data.status === 'success'){
                       if (data.action === 'otp' || data.action === 'pin'){
+
+                          //reset otp
+                          this.otp = '';
+
                           this.otpLabel = data.message;
                           this.otpHint =  data.action === 'pin' ? 'Card pin' : 'OTP';
                           this.otpData = {
