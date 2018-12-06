@@ -1,5 +1,6 @@
 <template>
   <v-card>
+
     <v-card-text class="pt-4">
       <!--<div class="text-xs-center">
         <p>{{email}}</p>
