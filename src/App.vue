@@ -63,7 +63,7 @@
                     color="red"
             ></v-progress-circular>
 
-            <v-btn v-if="inline" v-else icon @click="closeDialog">
+            <v-btn v-if="inline && !loading" icon @click="closeDialog">
               <v-icon>close</v-icon>
             </v-btn>
 
