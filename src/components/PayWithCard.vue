@@ -40,6 +40,9 @@
         </div>
       </template>
 
+      <template v-else-if="target === 'iframe'">
+        <iframe :src="iframeUrl" height="100%" width="100%"></iframe>
+      </template>
       <template v-else>
         <h3><b>{{otpLabel}}</b></h3>
         <v-text-field ref="otpField" type="password" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" :label="otpHint" @keyup.enter="verifyOtp" v-model="otp"></v-text-field>
@@ -71,6 +74,7 @@ export default {
         otp: '', // represents either the card pin or otp
         otpLabel: String,
         otpData: Object,
+        iframeUrl: null,
         success: false,
         successMessage: '',
         loading: false,
@@ -172,6 +176,10 @@ export default {
                           this.success = true;
 
                           window.parent.postMessage({name: 'done', reference: this.reference},'*');
+
+                      } else if (data.action === 'iframe'){
+                          this.iframeUrl = data.url;
+                          this.target = 'iframe';
 
                       }
                   } else if(data.status === 'error') {
