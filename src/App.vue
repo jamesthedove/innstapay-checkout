@@ -46,8 +46,8 @@
             </v-flex>
         </v-layout>
     </template>
-      <v-layout v-else flex align-center justify-center>
-        <v-flex xs12 sm6 md4 elevation-6>
+      <v-layout v-else :class="maximizeSize ? '' : 'flex align-center justify-center'">
+        <v-flex :class="maximizeSize ? '' : 'xs12 sm6 md4 elevation-6'">
           <v-toolbar
                   color="primary"
                   dark
@@ -104,7 +104,7 @@
                     id="tab-card"
                     key="card"
             >
-              <pay-with-card :fingerprint="fingerprint" :reference="reference" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-card>
+              <pay-with-card v-on:maximize="setMaximumSize" v-on:minimize="setMinimumSize" v-on:done="transactionCompleted" :fingerprint="fingerprint" :reference="reference" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-card>
             </v-tab-item>
             <v-tab-item
                     id="tab-ussd"
@@ -166,6 +166,7 @@ export default {
     return {
       paymentMethod: 'card',
       loading: false,
+      callbackUrl: '',
       merchantName: '',
       merchantLogo: '',
       merchantServices: '',
@@ -178,6 +179,7 @@ export default {
       shippingCharges: '',
       metadata: null,
       error: '',
+      maximizeSize: false,
       fingerprint: '',
       inline: true,
       paymentPage: false,
@@ -186,6 +188,20 @@ export default {
     }
   },
   methods: {
+      setMaximumSize(){
+        this.maximizeSize = true;
+      },
+      setMinimumSize(){
+        this.maximizeSize = false;
+      },
+      transactionCompleted(){
+        if (this.inline)
+          window.parent.postMessage({name: 'done', reference: this.reference},'*');
+        else {
+          if (this.callbackUrl)
+            window.location = `${this.callbackUrl}?ref=${this.reference}`;
+        }
+      },
       checkoutFormDone(details){
         this.showDetailsForm = false;
         this.userEmail = details.email;
@@ -300,6 +316,7 @@ export default {
                       this.merchantName = data.name;
                       this.merchantLogo = data.logo;
                       this.merchantServices =  merchantServices || data.services; //TODO make sure the merchantServices is present in the data.services
+                      this.callbackUrl = data.callbackUrl;
                       this.banks = data.banks;
                       this.loading = false;
                       this.reference = data.ref;

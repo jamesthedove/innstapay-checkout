@@ -175,11 +175,12 @@ export default {
                           this.successMessage = data.message;
                           this.success = true;
 
-                          window.parent.postMessage({name: 'done', reference: this.reference},'*');
+                          this.$emit('done');
 
                       } else if (data.action === 'iframe'){
                           this.iframeUrl = data.url;
                           this.target = 'iframe';
+                          this.$emit('maximize');
 
                       }
                   } else if(data.status === 'error') {
