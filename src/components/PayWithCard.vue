@@ -158,6 +158,7 @@ export default {
               axios.post(Config.baseUrl+Config.chargeUrl, {payload: encryptedPayload} ).then((response) => {
                   const data = response.data;
                   if (data.status === 'success'){
+                      this.otpLoading = false; // in case the pin was entered first
                       if (data.action === 'otp' || data.action === 'pin'){
 
                           //reset otp
@@ -190,6 +191,7 @@ export default {
 
               }).catch((e) => {
                   this.loading = false;
+                  this.otpLoading = false;
 
                   if (e.response){
 
