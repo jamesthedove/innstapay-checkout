@@ -195,6 +195,7 @@ export default {
         this.maximizeSize = false;
       },
       transactionCompleted(){
+          window.transactionCompleted = true;
         if (this.inline)
           window.parent.postMessage({name: 'done', reference: this.reference},'*');
         else {

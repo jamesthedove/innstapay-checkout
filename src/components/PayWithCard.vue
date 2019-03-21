@@ -103,6 +103,7 @@ export default {
     methods:{
       verifyOtp(){
           if (this.otpData.action === 'pin'){
+            this.otpLoading = true;
             this.pay();
           } else if (this.otp){
               this.otpData.value = this.otp;
@@ -115,8 +116,7 @@ export default {
                   if (data.status === 'success' && data.action === 'done'){
                       this.successMessage = data.message;
                       this.success = true;
-                      window.transactionCompleted = true;
-                      window.parent.postMessage({name: 'done', reference: this.reference},'*');
+                      this.$emit('done');
 
                   }
               }).catch((e) => {
