@@ -3,7 +3,7 @@
  */
 export default {
     baseUrl: process.env.VUE_APP_BASE_URL,
-    version: require('../package.json').version,
+    version: '0.1.0',
     chargeUrl: `initiateCharge`,
     chargeBankUrl: `initiateBankCharge`,
     continueUrl: `continuePayment`,
