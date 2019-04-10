@@ -1,7 +1,7 @@
 <template>
-  <v-card>
+  <v-card :style="target === 'iframe' ? 'height: 100%' : ''">
 
-    <v-card-text class="pt-4">
+    <v-card-text class="pt-4" :style="target === 'iframe' ? 'height: 100%' : ''">
       <!--<div class="text-xs-center">
         <p>{{email}}</p>
       </div>-->
@@ -222,6 +222,15 @@ export default {
 
       this.amountText = Utilities.getCommaSeparatedNumber(this.amount.toString());
 
+      document.addEventListener('payment_success',  () => {
+        console.log('payment success');
+        this.successMessage = 'Payment was successful';
+
+        this.success = true;
+
+        this.$emit('done');
+
+      })
       new Card({
           // a selector or DOM element for the form where users will
           // be entering their information

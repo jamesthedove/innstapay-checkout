@@ -99,15 +99,18 @@
               </v-tab>
             </v-tabs>
           </v-toolbar>
-          <v-tabs-items v-model="paymentMethod">
+          <v-tabs-items :style="maximizeSize ? 'height: 100%' : ''" v-model="paymentMethod">
             <v-tab-item
+                    :style="maximizeSize ? 'height: 100%' : ''"
                     id="tab-card"
+                    :disabled="maximizeSize"
                     key="card"
             >
               <pay-with-card v-on:maximize="setMaximumSize" v-on:minimize="setMinimumSize" v-on:done="transactionCompleted" :fingerprint="fingerprint" :reference="reference" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-card>
             </v-tab-item>
             <v-tab-item
                     id="tab-ussd"
+                    :disabled="maximizeSize"
                     key="ussd"
             >
              <pay-with-bank :fingerprint="fingerprint" :reference="reference" :banks="banks" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-bank>
