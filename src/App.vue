@@ -97,6 +97,14 @@
               >
                 Qr
               </v-tab>
+              <v-tab
+                      v-if="merchantServices.indexOf('bank-transfer') > -1"
+                      key="bt"
+                      @click="bankTransferClicked"
+                      href="#tab-bt"
+              >
+                Transfer
+              </v-tab>
             </v-tabs>
           </v-toolbar>
           <v-tabs-items :style="maximizeSize ? 'height: 100%' : ''" v-model="paymentMethod">
@@ -120,6 +128,12 @@
                     key="qr"
             >
               <pay-with-qr :fingerprint="fingerprint" :reference="reference" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-qr>
+            </v-tab-item>
+            <v-tab-item
+                    id="tab-bt"
+                    key="bt"
+            >
+              <pay-with-bank-transfer :fingerprint="fingerprint" :reference="reference" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-bank-transfer>
             </v-tab-item>
           </v-tabs-items>
         </v-flex>
@@ -156,10 +170,12 @@ import PayWithBank from './components/PayWithBank'
 import CheckoutForm from './components/CheckoutForm'
 import Fingerprint from 'fingerprintjs2'
 import PayWithQr from "./components/PayWithQr";
+import PayWithBankTransfer from "./components/PayWithBankTransfer";
 
 export default {
   name: 'App',
   components: {
+    PayWithBankTransfer,
       PayWithQr,
       PayWithBank,
       PayWithCard,
@@ -218,6 +234,10 @@ export default {
       qrClicked(){
          console.log('qr clicked');
          document.dispatchEvent(new Event("getQr"));
+      },
+      bankTransferClicked(){
+        console.log('bank transfer clicked');
+        document.dispatchEvent(new Event("getBankTransferAccount"));
       },
       pay(){
 
@@ -288,6 +308,11 @@ export default {
               if(parseInt(Utilites.getParameterByName('b')) > -1){
                   merchantServices.push('bank')
               }
+
+              if(parseInt(Utilites.getParameterByName('bt')) > -1){
+                merchantServices.push('bank-transfer')
+              }
+
               if(parseInt(Utilites.getParameterByName('q')) > -1){
                   merchantServices.push('qr')
               }
