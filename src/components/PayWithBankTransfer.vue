@@ -13,14 +13,54 @@
         </div>
       </template>
 
-      <template v-else-if="successMessage">
-        <v-flex class="text-xs-center">
-          <v-icon color="green" x-large>info</v-icon>
-          <h3>{{successMessage}}</h3>
-          <h3>Account Number: {{accountNumber}}</h3>
-          <h3>Account Bank: {{accountBank}}</h3>
-          <p>Once The Payment is made successfully, the transaction will be completed.</p>
+    <template v-else-if="success">
+        <v-flex transition="slide-y-transition" class="text-xs-center">
+            <v-icon color="green" x-large>check</v-icon>
+            <h3>{{successMessage}}</h3>
         </v-flex>
+    </template>
+      <template v-else-if="transferNote">
+        <p><b>Please proceed to your mobile banking/internet banking app to complete your bank transfer payment to {{accountName}}</b></p>
+      <div class="text-xs-center">
+          <v-layout  row>
+              <v-flex xs6>
+                  <h3>Amount</h3>
+              </v-flex>
+              <v-flex xs6>
+                  <h3>₦ {{amountText}}</h3>
+              </v-flex>
+          </v-layout>
+          <hr/>
+          <v-layout  row>
+              <v-flex xs6>
+                  <h3>Account Name</h3>
+              </v-flex>
+              <v-flex xs6>
+                  <h3>{{accountName}}</h3>
+              </v-flex>
+          </v-layout>
+          <hr/>
+          <v-layout  row>
+              <v-flex xs6>
+                  <h3>Account Number</h3>
+              </v-flex>
+              <v-flex xs6>
+                  <h3>{{accountNumber}}</h3>
+              </v-flex>
+          </v-layout>
+          <hr/>
+          <v-layout row>
+              <v-flex xs6>
+                  <h3>Account Bank</h3>
+              </v-flex>
+              <v-flex xs6>
+                  <h3>{{accountBank}}</h3>
+              </v-flex>
+          </v-layout>
+      </div>
+
+
+          <p class="mt-5">Once The Payment is received, this transaction will automatically completed and this page will close.</p>
       </template>
       <template v-else>
 
@@ -49,12 +89,14 @@ export default {
   data: function () {
     return {
         success: false,
+        transferNote: '',
         successMessage: '',
         loading: false,
         amountText: '',
         error: '',
         accountNumber: '',
         accountBank: '',
+        accountName: '',
         bankTransferLoading: true,
     }
   },
@@ -87,13 +129,16 @@ export default {
               this.bankTransferLoading = false;
 
               if (data.status === 'success'){
-                  this.successMessage = data.note;
+                  this.transferNote = data.note;
                   this.accountNumber = data.account;
                   this.accountBank = data.bank;
+                  const index = data.note.indexOf("to");
+                  this.accountName = data.note.substring(index + 3, data.note.length)
               }
 
               document.addEventListener('payment_success',  () => {
                   console.log('payment success');
+                  this.success = true;
                   this.successMessage = 'Payment was successful';
                   window.parent.postMessage({name: 'done', reference: this.reference},'*');
 
