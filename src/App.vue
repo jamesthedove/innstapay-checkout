@@ -121,7 +121,7 @@
                     :disabled="maximizeSize"
                     key="ussd"
             >
-             <pay-with-bank :fingerprint="fingerprint" :reference="reference" :banks="banks" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-bank>
+             <pay-with-bank v-on:maximize="setMaximumSize" v-on:minimize="setMinimumSize" :fingerprint="fingerprint" :reference="reference" :banks="banks" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-bank>
             </v-tab-item>
             <v-tab-item
                     id="tab-qr"
