@@ -117,6 +117,7 @@
               <pay-with-card v-on:maximize="setMaximumSize" v-on:minimize="setMinimumSize" v-on:done="transactionCompleted" :fingerprint="fingerprint" :reference="reference" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-card>
             </v-tab-item>
             <v-tab-item
+                    :style="maximizeSize ? 'height: 100%' : ''"
                     id="tab-ussd"
                     :disabled="maximizeSize"
                     key="ussd"
@@ -125,12 +126,14 @@
             </v-tab-item>
             <v-tab-item
                     id="tab-qr"
+                    :disabled="maximizeSize"
                     key="qr"
             >
               <pay-with-qr :fingerprint="fingerprint" :reference="reference" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-qr>
             </v-tab-item>
             <v-tab-item
                     id="tab-bt"
+                    :disabled="maximizeSize"
                     key="bt"
             >
               <pay-with-bank-transfer :fingerprint="fingerprint" :reference="reference" :email="userEmail" :pkey="merchantPublicKey" :amount="amount"></pay-with-bank-transfer>
