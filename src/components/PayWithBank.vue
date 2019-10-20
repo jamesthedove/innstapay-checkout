@@ -1,11 +1,14 @@
 <template>
-  <v-card>
-    <v-card-text class="pt-4">
+  <v-card :style="target === 'iframe' ? 'height: 100%' : ''">
+    <v-card-text class="pt-4" :style="target === 'iframe' ? 'height: 100%' : ''">
     <v-alert v-if="error" outline color="error" icon="warning" :value="error">
         {{error}}
     </v-alert>
     <template v-else-if="success">
         <h3>Transaction was successful</h3>
+    </template>
+    <template v-else-if="target === 'iframe'">
+        <iframe :src="iframeUrl" height="100%" width="100%"></iframe>
     </template>
     <template v-else-if="target === 'form'">
         <v-select v-model="selectedBank" :items="bankList" label="Select Bank"></v-select>
@@ -60,6 +63,7 @@ export default {
         selectedBank: String,
         loading: false,
         success: false,
+        iframeUrl: null,
         target: 'form',
         selectedBankObject: null,
         phoneNumber: '',
@@ -93,7 +97,9 @@ export default {
 
                 if (data.status === 'success'){
                     if (this.directPay){
-                        this.openWindow();
+                        this.iframeUrl = data.url;
+                        this.target = 'iframe';
+                        this.$emit('maximize');
                     } else
                         this.target = data.action;
                 }
@@ -106,29 +112,6 @@ export default {
       payWithInternetBanking(){
           this.directPay = true;
           this.pay();
-      },
-      openWindow(){
-
-
-          const f = $("<form target='_blank' style='display:none;'></form>").attr({
-              action: this.initialResponse.url
-          }).appendTo(document.body);
-
-
-          f.submit();
-
-          f.remove();
-
-
-          window.onfocus = ()=> {
-
-              console.log('focused');
-          };
-         window.onblur = ()=> {
-
-              console.log('onblur');
-          };
-
       },
     verifyOtp(){
 

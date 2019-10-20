@@ -18,7 +18,7 @@
       </template>
 
       <template v-else-if="success">
-        <v-flex class="text-xs-center">
+        <v-flex  class="text-xs-center">
           <v-icon color="green" x-large>check</v-icon>
           <h3>{{successMessage}}</h3>
         </v-flex>

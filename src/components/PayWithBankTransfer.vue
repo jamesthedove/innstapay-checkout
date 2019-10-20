@@ -58,9 +58,7 @@
               </v-flex>
           </v-layout>
       </div>
-
-
-          <p class="mt-5">Once The Payment is received, this transaction will automatically completed and this page will close. Please note that depending on your bank, the transaction might take up to 5 minutes or more to complete</p>
+          <p class="mt-5">Once The Payment is received, this transaction will automatically be completed and this page will close. Please note that depending on your bank, the transaction might take up to 5 minutes or more to complete</p>
       </template>
       <template v-else>
 
